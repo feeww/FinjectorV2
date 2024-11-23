@@ -24,11 +24,6 @@ namespace FinjectorV2
             int nHeightEllipse // width of ellipse
         );
 
-        public void ErrorMsg(string ErrorText)
-        {
-            MessageBox.Show(ErrorText, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-        }
-
         public Form1()
         {
             InitializeComponent();
@@ -60,7 +55,7 @@ namespace FinjectorV2
             }
             catch (Exception ex)
             {
-                ErrorMsg(ex.Message);
+                NotificationManager.ShowErrorNotification(ex.Message);
             }
         }
 
@@ -76,8 +71,9 @@ namespace FinjectorV2
             {
                 CoreFunctions.Inject(false);
                 pbStatusRed.Visible = false; pbStatusGreen.Visible = true;
+                NotificationManager.ShowSuccessNotification("Injected!");
             }
-            else { ErrorMsg("Roblox not found or already Injected!"); }
+            else { NotificationManager.ShowErrorNotification("Error. Roblox NOT found!"); }
         }
 
         private async void btnExecute_Click(object sender, EventArgs e)
@@ -89,16 +85,15 @@ namespace FinjectorV2
             if (CoreFunctions.IsInjected() == true)
             {
                 CoreFunctions.ExecuteScript(editorContent);
+                NotificationManager.ShowSuccessNotification("Script Executed!");
             }
-            else { ErrorMsg("You are not injected!"); }
+            else { NotificationManager.ShowErrorNotification("Inject please!"); }
         }
 
         private void btnClear_Click(object sender, EventArgs e)
         {
             SetEditorContent("");
-            NotificationManager.ShowSuccessNotification("Success");
-           // NotificationManager.ShowErrorNotification("Error");
-
+            NotificationManager.ShowSuccessNotification("Passed");
         }
 
         private void timer1_Tick(object sender, EventArgs e)

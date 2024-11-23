@@ -5,49 +5,40 @@ using System.Windows.Forms;
 
 public static class NotificationManager
 {
-    /// <summary>
-    /// Відображення повідомлення про успішну операцію.
-    /// </summary>
-    /// <param name="message">Текст повідомлення.</param>
+    private static int notificationCount = 0; // Лічильник повідомлень
+
     public static async void ShowSuccessNotification(string message)
     {
         await ShowNotification(
             message,
-            backgroundColor: Color.FromArgb(20, 20, 20), // Темний фон
-            textColor: Color.FromArgb(0, 255, 0), // Зелений текст
-            font: new Font("Segoe UI", 9, FontStyle.Regular), // Сучасний шрифт
-            logo: Image.FromFile("Icons/Success.png"), // Іконка успіху
+            backgroundColor: Color.FromArgb(20, 20, 20),
+            textColor: Color.FromArgb(103, 192, 0),
+            font: new Font("Consolas", 12, FontStyle.Regular),
+            logo: Image.FromFile("Icons/Success.png"),
             hoverOpacity: 1.0,
             regularOpacity: 0.85,
-            duration: 1000, // 4 секунди
-            size: new Size(250, 60), // Зменшений розмір
-            position: NotificationPosition.BottomRight // Нижній правий кут
+            duration: 2000, // Збільшено до 4 секунд
+            size: new Size(250, 60),
+            position: NotificationPosition.BottomRight
         );
     }
 
-    /// <summary>
-    /// Відображення повідомлення про неуспішну операцію.
-    /// </summary>
-    /// <param name="message">Текст повідомлення.</param>
     public static async void ShowErrorNotification(string message)
     {
         await ShowNotification(
             message,
-            backgroundColor: Color.FromArgb(20, 20, 20), // Темний фон
-            textColor: Color.FromArgb(255, 0, 0), // Червоний текст
-            font: new Font("Segoe UI", 9, FontStyle.Regular), // Сучасний шрифт
-            logo: Image.FromFile("Icons/Error.png"), // Іконка помилки
+            backgroundColor: Color.FromArgb(20, 20, 20),
+            textColor: Color.FromArgb(255, 0, 0),
+            font: new Font("Consolas", 10, FontStyle.Regular),
+            logo: Image.FromFile("Icons/Error.png"),
             hoverOpacity: 1.0,
             regularOpacity: 0.85,
-            duration: 5000, // 5 секунд
-            size: new Size(250, 60), // Зменшений розмір
-            position: NotificationPosition.BottomRight // Нижній правий кут
+            duration: 3000,
+            size: new Size(250, 60),
+            position: NotificationPosition.BottomRight
         );
     }
 
-    /// <summary>
-    /// Базовий метод для створення повідомлення.
-    /// </summary>
     private static async Task ShowNotification(
         string text,
         Color? backgroundColor,
@@ -66,12 +57,13 @@ public static class NotificationManager
             Size = size,
             BackColor = backgroundColor ?? Color.DarkGray,
             FormBorderStyle = FormBorderStyle.None,
-            StartPosition = FormStartPosition.Manual, // Встановлюємо координати вручну
+            StartPosition = FormStartPosition.Manual,
             TopMost = true,
-            Opacity = regularOpacity
+            Opacity = regularOpacity,
+            ShowInTaskbar = false // Не показувати у панелі задач
         };
 
-        // Встановлюємо позицію в залежності від екрана
+        // Встановлюємо позицію в залежності від кількості повідомлень
         notificationForm.Location = CalculatePosition(size, position);
 
         // Додаємо іконку
@@ -80,7 +72,7 @@ public static class NotificationManager
             var pictureBox = new PictureBox
             {
                 Image = logo,
-                Size = new Size(30, 30), // Зменшена іконка
+                Size = new Size(30, 30),
                 Location = new Point(10, 15),
                 SizeMode = PictureBoxSizeMode.Zoom
             };
@@ -96,8 +88,8 @@ public static class NotificationManager
             BackColor = Color.Transparent,
             AutoSize = false,
             TextAlign = ContentAlignment.MiddleLeft,
-            Location = new Point(50, 10), // Відступ від іконки
-            Size = new Size(size.Width - 60, size.Height - 20) // Враховує розмір іконки
+            Location = new Point(50, 10),
+            Size = new Size(size.Width - 60, size.Height - 20)
         };
         notificationForm.Controls.Add(label);
 
@@ -107,39 +99,56 @@ public static class NotificationManager
 
         // Відображаємо повідомлення
         notificationForm.Show();
+        notificationCount++;
+
+        // Анімація появи
+        for (double i = 0; i <= 1; i += 0.05)
+        {
+            notificationForm.Opacity = i;
+            await Task.Delay(20);
+        }
 
         // Очікуємо заданий час
         await Task.Delay(duration);
+
+        // Анімація зникнення
+        for (double i = 1; i >= 0; i -= 0.05)
+        {
+            notificationForm.Opacity = i;
+            await Task.Delay(20);
+        }
 
         // Закриваємо повідомлення
         if (!notificationForm.IsDisposed)
         {
             notificationForm.Close();
         }
+
+        notificationCount--;
     }
 
-    /// <summary>
-    /// Розрахунок позиції сповіщення.
-    /// </summary>
     private static Point CalculatePosition(Size notificationSize, NotificationPosition position)
     {
         var screenBounds = Screen.PrimaryScreen.WorkingArea;
+
+        // Розрахунок вертикальної позиції на основі кількості повідомлень
+        int verticalOffset = notificationCount * (notificationSize.Height + 10); // В ідступ між повідомленнями
 
         return position switch
         {
             NotificationPosition.TopRight => new Point(
                 screenBounds.Right - notificationSize.Width - 10,
-                screenBounds.Top + 10),
+                screenBounds.Top + verticalOffset + 10),
             NotificationPosition.TopLeft => new Point(
                 screenBounds.Left + 10,
-                screenBounds.Top + 10),
+                screenBounds.Top + verticalOffset + 10),
             NotificationPosition.BottomRight => new Point(
                 screenBounds.Right - notificationSize.Width - 10,
-                screenBounds.Bottom - notificationSize.Height - 10),
+                screenBounds.Bottom - notificationSize.Height - verticalOffset - 10),
             NotificationPosition.BottomLeft => new Point(
                 screenBounds.Left + 10,
-                screenBounds.Bottom - notificationSize.Height - 10),
-            _ => new Point(screenBounds.Right - notificationSize.Width - 10, screenBounds.Bottom - notificationSize.Height - 10)
+                screenBounds.Bottom - notificationSize.Height - verticalOffset - 10),
+            _ => new Point(screenBounds.Right - notificationSize.Width - 10, screenBounds.Bottom - notificationSize.Height - verticalOffset - 10)
         };
     }
 }
