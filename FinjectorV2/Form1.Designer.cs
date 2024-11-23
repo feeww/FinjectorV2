@@ -89,7 +89,6 @@
             pbStatusGreen.TabIndex = 7;
             pbStatusGreen.TabStop = false;
             pbStatusGreen.UseGradient = false;
-            pbStatusGreen.Visible = false;
             // 
             // pbStatusRed
             // 

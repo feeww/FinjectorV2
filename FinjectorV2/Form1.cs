@@ -1,3 +1,4 @@
+﻿using CodeeloUI.Components;
 using cxapi;
 using Newtonsoft.Json;
 using System.Runtime.InteropServices;
@@ -35,6 +36,8 @@ namespace FinjectorV2
             LoadWebViewContent("Monaco/index.html");
             this.FormBorderStyle = FormBorderStyle.None;
             Region = System.Drawing.Region.FromHrgn(CreateRoundRectRgn(0, 0, Width, Height, 25, 25));
+
+            pbStatusRed.Visible = true; pbStatusGreen.Visible = false;
         }
 
         private async void LoadWebViewContent(string htmlFile)
@@ -72,6 +75,7 @@ namespace FinjectorV2
             if (CoreFunctions.IsRobloxOpen() == true && CoreFunctions.IsInjected() == false)
             {
                 CoreFunctions.Inject(false);
+                pbStatusRed.Visible = false; pbStatusGreen.Visible = true;
             }
             else { ErrorMsg("Roblox not found or already Injected!"); }
         }
@@ -92,6 +96,9 @@ namespace FinjectorV2
         private void btnClear_Click(object sender, EventArgs e)
         {
             SetEditorContent("");
+            NotificationManager.ShowSuccessNotification("Success");
+           // NotificationManager.ShowErrorNotification("Error");
+
         }
 
         private void timer1_Tick(object sender, EventArgs e)
