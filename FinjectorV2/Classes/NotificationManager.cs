@@ -5,7 +5,23 @@ using System.Windows.Forms;
 
 public static class NotificationManager
 {
-    private static int notificationCount = 0; // Лічильник повідомлень
+    private static int notificationCount = 0; 
+
+    private static Image LoadImage(string primaryPath, string fallbackPath)
+    {
+        if (System.IO.File.Exists(primaryPath))
+        {
+            return Image.FromFile(primaryPath);
+        }
+        else if (System.IO.File.Exists(fallbackPath))
+        {
+            return Image.FromFile(fallbackPath);
+        }
+        else
+        {
+            throw new System.IO.FileNotFoundException("Image not found in both primary and fallback paths.");
+        }
+    }
 
     public static async void ShowSuccessNotification(string message)
     {
@@ -14,10 +30,10 @@ public static class NotificationManager
             backgroundColor: Color.FromArgb(20, 20, 20),
             textColor: Color.FromArgb(103, 192, 0),
             font: new Font("Consolas", 12, FontStyle.Regular),
-            logo: Image.FromFile("Icons/Success.png"),
+            logo: LoadImage("Finjector/Icons/Success.png", "workspace/Finjector/Icons/Success.png"),
             hoverOpacity: 1.0,
             regularOpacity: 0.85,
-            duration: 2000, // Збільшено до 4 секунд
+            duration: 2000, // 2 seconds
             size: new Size(250, 60),
             position: NotificationPosition.BottomRight
         );
@@ -30,7 +46,23 @@ public static class NotificationManager
             backgroundColor: Color.FromArgb(20, 20, 20),
             textColor: Color.FromArgb(255, 0, 0),
             font: new Font("Consolas", 10, FontStyle.Regular),
-            logo: Image.FromFile("Icons/Error.png"),
+            logo: LoadImage("Finjector/Icons/Error.png", "workspace/Finjector/Icons/Error.png"),
+            hoverOpacity: 1.0,
+            regularOpacity: 0.85,
+            duration: 3000,
+            size: new Size(250, 60),
+            position: NotificationPosition.BottomRight
+        );
+    }
+
+    public static async void ShowInfoNotification(string message)
+    {
+        await ShowNotification(
+            message,
+            backgroundColor: Color.FromArgb(20, 20, 20),
+            textColor: Color.FromArgb(0, 0, 250),
+            font: new Font("Consolas", 10, FontStyle.Regular),
+            logo: LoadImage("Finjector/Icons/Info.png", "workspace/Finjector/Icons/Info.png"),
             hoverOpacity: 1.0,
             regularOpacity: 0.85,
             duration: 3000,
@@ -51,7 +83,7 @@ public static class NotificationManager
         Size size,
         NotificationPosition position)
     {
-        // Створюємо форму повідомлення
+
         Form notificationForm = new Form
         {
             Size = size,
@@ -60,13 +92,11 @@ public static class NotificationManager
             StartPosition = FormStartPosition.Manual,
             TopMost = true,
             Opacity = regularOpacity,
-            ShowInTaskbar = false // Не показувати у панелі задач
+            ShowInTaskbar = false 
         };
 
-        // Встановлюємо позицію в залежності від кількості повідомлень
         notificationForm.Location = CalculatePosition(size, position);
 
-        // Додаємо іконку
         if (logo != null)
         {
             var pictureBox = new PictureBox
@@ -79,7 +109,6 @@ public static class NotificationManager
             notificationForm.Controls.Add(pictureBox);
         }
 
-        // Додаємо текст
         var label = new Label
         {
             Text = text,
@@ -93,32 +122,26 @@ public static class NotificationManager
         };
         notificationForm.Controls.Add(label);
 
-        // Події для прозорості
         notificationForm.MouseEnter += (s, e) => notificationForm.Opacity = hoverOpacity;
         notificationForm.MouseLeave += (s, e) => notificationForm.Opacity = regularOpacity;
 
-        // Відображаємо повідомлення
         notificationForm.Show();
         notificationCount++;
 
-        // Анімація появи
         for (double i = 0; i <= 1; i += 0.05)
         {
             notificationForm.Opacity = i;
             await Task.Delay(20);
         }
 
-        // Очікуємо заданий час
         await Task.Delay(duration);
 
-        // Анімація зникнення
         for (double i = 1; i >= 0; i -= 0.05)
         {
             notificationForm.Opacity = i;
             await Task.Delay(20);
         }
 
-        // Закриваємо повідомлення
         if (!notificationForm.IsDisposed)
         {
             notificationForm.Close();
@@ -131,8 +154,7 @@ public static class NotificationManager
     {
         var screenBounds = Screen.PrimaryScreen.WorkingArea;
 
-        // Розрахунок вертикальної позиції на основі кількості повідомлень
-        int verticalOffset = notificationCount * (notificationSize.Height + 10); // В ідступ між повідомленнями
+        int verticalOffset = notificationCount * (notificationSize.Height + 10); 
 
         return position switch
         {
@@ -153,9 +175,6 @@ public static class NotificationManager
     }
 }
 
-/// <summary>
-/// Перерахування для позицій сповіщення.
-/// </summary>
 public enum NotificationPosition
 {
     TopRight,

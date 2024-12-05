@@ -10,15 +10,13 @@
 
   <ItemGroup>
     <PackageReference Include="CodeeloUI" Version="1.2.0" />
-    <PackageReference Include="FastColoredTextBox.Net6" Version="1.0.0" />
-    <PackageReference Include="FCTB" Version="2.16.24" />
     <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2903.40" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
 
   <ItemGroup>
     <Reference Include="cxapis">
-      <HintPath>..\..\..\..\OneDrive\Документы\cxapis.dll</HintPath>
+      <HintPath>..\..\..\..\Downloads\cxapis.dll</HintPath>
     </Reference>
   </ItemGroup>
 

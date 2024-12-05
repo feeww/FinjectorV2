@@ -307,6 +307,7 @@
             // 
             // timer1
             // 
+            timer1.Interval = 10;
             timer1.Tick += timer1_Tick;
             // 
             // Form1
@@ -323,6 +324,7 @@
             FormBorderStyle = FormBorderStyle.None;
             Name = "Form1";
             Text = "Form1";
+            FormClosing += Form1_FormClosing;
             ((System.ComponentModel.ISupportInitialize)codeEditor).EndInit();
             panel1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)pbStatusGreen).EndInit();
